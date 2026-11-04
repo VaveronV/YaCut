@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Загрузка файлов — YaCut</title>
+</head>
+<body>
+    <h1>Загрузка файлов</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        {{ form.files.label }}
+        {{ form.files(multiple=True) }}
+
+        {% for error in form.files.errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+
+        <button type="submit">Загрузить</button>
+    </form>
+
+    {% if results %}
+        <h2>Файлы загружены</h2>
+        {% for result in results %}
+            <p>
+                {{ result.filename }}:
+                <a href="{{ result.short_link }}">
+                    {{ result.short_link }}
+                </a>
+            </p>
+        {% endfor %}
+    {% endif %}
+
+    <a href="/">На главную</a>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>YaCut</title>
+</head>
+<body>
+    <h1>YaCut — укоротитель ссылок</h1>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div>
+            {{ form.original_link.label }}
+            {{ form.original_link() }}
+            {% for error in form.original_link.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div>
+            {{ form.custom_id.label }}
+            {{ form.custom_id() }}
+            {% for error in form.custom_id.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <button type="submit">Создать</button>
+    </form>
+
+    {% for message in get_flashed_messages() %}
+        <p>{{ message }}</p>
+    {% endfor %}
+
+    {% if short_link %}
+        <p>
+            Ваша короткая ссылка:
+            <a href="{{ short_link }}">{{ short_link }}</a>
+        </p>
+    {% endif %}
+</body>
+</html>
