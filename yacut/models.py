@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+import datetime
 
 from yacut import db
 from yacut.constants import (
@@ -21,5 +21,7 @@ class URLMap(db.Model):
     timestamp = db.Column(
         db.DateTime(timezone=True),
         index=True,
-        default=lambda: datetime.now(timezone.utc)
+        default=lambda: datetime.datetime.now(
+            datetime.timezone.utc
+        )
     )
