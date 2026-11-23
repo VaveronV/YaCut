@@ -3,6 +3,7 @@ import aiohttp
 from yacut import app
 
 
+YANDEX_DISK_FOLDER = 'YaCut'
 YANDEX_DISK_API = 'https://cloud-api.yandex.net/v1/disk/resources'
 UPLOAD_URL = f'{YANDEX_DISK_API}/upload'
 PUBLISH_URL = f'{YANDEX_DISK_API}/publish'
@@ -21,7 +22,7 @@ async def upload_file(file, filename):
     async with aiohttp.ClientSession() as session:
         # Получаем ссылку для загрузки.
         params = {
-            'path': filename,
+            'path': f'{YANDEX_DISK_FOLDER}/{filename}',
             'overwrite': OVERWRITE_EXISTING
         }
 
@@ -46,7 +47,9 @@ async def upload_file(file, filename):
         async with session.put(
             PUBLISH_URL,
             headers=headers,
-            params={'path': filename}
+            params={
+                'path': f'{YANDEX_DISK_FOLDER}/{filename}'
+            }
         ) as response:
             response.raise_for_status()
 
@@ -55,7 +58,7 @@ async def upload_file(file, filename):
             YANDEX_DISK_API,
             headers=headers,
             params={
-                'path': filename,
+                'path': f'{YANDEX_DISK_FOLDER}/{filename}',
                 'fields': 'public_url'
             }
         ) as response:
