@@ -1,6 +1,3 @@
-
-from http import HTTPStatus
-
 import aiohttp
 
 from yacut import app
@@ -23,18 +20,6 @@ async def upload_file(file, filename):
     }
 
     async with aiohttp.ClientSession() as session:
-        # Создаём папку.
-        async with session.put(
-            YANDEX_DISK_API,
-            headers=headers,
-            params={'path': YANDEX_DISK_FOLDER}
-        ) as response:
-            if response.status not in (
-                HTTPStatus.CREATED,
-                HTTPStatus.CONFLICT
-            ):
-                response.raise_for_status()
-
         # Получаем ссылку для загрузки.
         params = {
             'path': f'{YANDEX_DISK_FOLDER}/{filename}',
