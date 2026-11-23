@@ -1,5 +1,4 @@
 import asyncio
-import uuid
 
 from flask import (
     flash,
@@ -10,11 +9,11 @@ from flask import (
 from werkzeug.utils import secure_filename
 
 from yacut import app
+from yacut.constants import DUPLICATE_ERROR, RESERVED_SHORT_ID
 from yacut.file_services import upload_file
 from yacut.forms import FileForm, URLForm
 from yacut.models import URLMap
 from yacut.utils import create_url_map
-from yacut.constants import DUPLICATE_ERROR, RESERVED_SHORT_ID
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -68,7 +67,7 @@ def upload_files_view():
             if not filename:
                 continue
 
-            disk_filename = f'{uuid.uuid4().hex}_{filename}'
+            disk_filename = filename
 
             public_url = asyncio.run(
                 upload_file(file.stream, disk_filename)
