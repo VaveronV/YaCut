@@ -35,9 +35,11 @@ async def upload_file(file, filename):
             upload_url = (await response.json())['href']
 
         # Загружаем файл.
+        file.seek(0)
+
         async with session.put(
             upload_url,
-            data=file
+            data=file.read()
         ) as response:
             response.raise_for_status()
 
