@@ -32,7 +32,6 @@ def index_view():
             return render_template('index.html', form=form)
 
         url_map = create_url_map(original, custom_id)
-
         short_link = url_for(
             'redirect_view',
             short_id=url_map.short,
@@ -62,19 +61,17 @@ def upload_files_view():
         results = []
 
         for file in form.files.data:
-            filename = secure_filename(file.filename)
+            original_filename = file.filename
+            filename = secure_filename(original_filename)
 
             if not filename:
                 continue
 
-            disk_filename = filename
-
-            public_url = asyncio.run(
-                upload_file(file.stream, disk_filename)
+            download_url = asyncio.run(
+                upload_file(file.stream, filename)
             )
 
-            url_map = create_url_map(public_url)
-
+            url_map = create_url_map(download_url)
             short_link = url_for(
                 'redirect_view',
                 short_id=url_map.short,
@@ -82,7 +79,7 @@ def upload_files_view():
             )
 
             results.append({
-                'filename': filename,
+                'filename': original_filename,
                 'short_link': short_link
             })
 

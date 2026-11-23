@@ -6,35 +6,29 @@ from yacut import app
 YANDEX_DISK_FOLDER = 'YaCut'
 YANDEX_DISK_API = 'https://cloud-api.yandex.net/v1/disk/resources'
 UPLOAD_URL = f'{YANDEX_DISK_API}/upload'
-PUBLISH_URL = f'{YANDEX_DISK_API}/publish'
+DOWNLOAD_URL = f'{YANDEX_DISK_API}/download'
 
 OVERWRITE_EXISTING = 'true'
 
 
 async def upload_file(file, filename):
-    """Загружает файл на Яндекс Диск и получает публичную ссылку."""
+    """Загружает файл на Яндекс Диск и возвращает ссылку на скачивание."""
     token = app.config['DISK_TOKEN']
-
-    headers = {
-        'Authorization': f'OAuth {token}'
-    }
+    headers = {'Authorization': f'OAuth {token}'}
+    disk_path = f'{YANDEX_DISK_FOLDER}/{filename}'
 
     async with aiohttp.ClientSession() as session:
-        # Получаем ссылку для загрузки.
-        params = {
-            'path': f'{YANDEX_DISK_FOLDER}/{filename}',
-            'overwrite': OVERWRITE_EXISTING
-        }
-
         async with session.get(
             UPLOAD_URL,
             headers=headers,
-            params=params
+            params={
+                'path': disk_path,
+                'overwrite': OVERWRITE_EXISTING
+            }
         ) as response:
             response.raise_for_status()
             upload_url = (await response.json())['href']
 
-        # Загружаем файл.
         file.seek(0)
 
         async with session.put(
@@ -43,29 +37,12 @@ async def upload_file(file, filename):
         ) as response:
             response.raise_for_status()
 
-        # Делаем файл публичным.
-        async with session.put(
-            PUBLISH_URL,
-            headers=headers,
-            params={
-                'path': f'{YANDEX_DISK_FOLDER}/{filename}'
-            }
-        ) as response:
-            response.raise_for_status()
-
-        # Получаем публичную ссылку.
         async with session.get(
-            YANDEX_DISK_API,
+            DOWNLOAD_URL,
             headers=headers,
-            params={
-                'path': f'{YANDEX_DISK_FOLDER}/{filename}',
-                'fields': 'public_url'
-            }
+            params={'path': disk_path}
         ) as response:
             response.raise_for_status()
-            public_url = (await response.json()).get('public_url')
+            download_url = (await response.json())['href']
 
-    if not public_url:
-        raise ValueError('Не удалось получить публичную ссылку на файл')
-
-    return public_url
+    return download_url
